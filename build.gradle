@@ -19,7 +19,7 @@ repositories {
 
 def springCloudVersion = '2024.0.0'
 
-def eurekaServerDependencies = [
+def springframeworkDependencies = [
 		'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client',
 		'org.springframework.cloud:spring-cloud-config-server'
 ]
@@ -59,7 +59,7 @@ def testDependencies = [
 dependencies {
 	implementation 'org.springframework:spring-core'
 
-	eurekaServerDependencies.each { implementation it }
+	springframeworkDependencies.each { implementation it }
 	lombokDependencies.each { compileOnly it }
 	lombokDependencies.each { annotationProcessor it }
 	lombokDependencies.each { testCompileOnly it }
