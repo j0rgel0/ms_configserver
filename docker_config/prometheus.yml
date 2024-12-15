@@ -1,0 +1,21 @@
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: [ 'prometheus:9090' ]
+  - job_name: 'zipkin-json-exporter'
+    static_configs:
+      - targets: ['json-exporter:7979']
+  - job_name: 'EUREKA-SERVER-PROMETHEUS-INPUT'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 3s
+    static_configs:
+      - targets: ['localhost:8761']
+        labels:
+          application: 'utility-service-registry'
+  - job_name: 'CONFIG-SERVER-PROMETHEUS-INPUT'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 3s
+    static_configs:
+      - targets: ['localhost:8888']
+        labels:
+          application: 'utility-config-server'

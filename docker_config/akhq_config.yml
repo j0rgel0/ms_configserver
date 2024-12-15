@@ -1,0 +1,9 @@
+akhq:
+  connections:
+    local-kafka:
+      properties:
+        bootstrap.servers: "kafka:9092"
+
+micronaut:
+  security:
+    enabled: false

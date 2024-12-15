@@ -1,0 +1,63 @@
+server:
+  listen_port: 7979
+
+endpoints:
+  - name: "zipkin"
+    url: "http://zipkin:9411/metrics"
+    metrics:
+      - name: zipkin_collector_messages_http_total
+        path: "$['counter.zipkin_collector.messages.http']"
+        type: counter
+        help: "Number of collected messages via HTTP"
+      - name: zipkin_collector_spans_grpc_total
+        path: "$['counter.zipkin_collector.spans.grpc']"
+        type: counter
+        help: "Number of collected spans via gRPC"
+      - name: zipkin_collector_spans_dropped_http_total
+        path: "$['counter.zipkin_collector.spans_dropped.http']"
+        type: counter
+        help: "Number of dropped spans via HTTP"
+      - name: zipkin_collector_messages_dropped_http_total
+        path: "$['counter.zipkin_collector.messages_dropped.http']"
+        type: counter
+        help: "Number of dropped messages via HTTP"
+      - name: zipkin_collector_bytes_http_total
+        path: "$['counter.zipkin_collector.bytes.http']"
+        type: counter
+        help: "Number of collected bytes via HTTP"
+      - name: zipkin_collector_message_spans_http
+        path: "$['gauge.zipkin_collector.message_spans.http']"
+        type: gauge
+        help: "Current message spans via HTTP"
+      - name: zipkin_collector_spans_http_total
+        path: "$['counter.zipkin_collector.spans.http']"
+        type: counter
+        help: "Number of collected spans via HTTP"
+      - name: zipkin_collector_message_spans_grpc
+        path: "$['gauge.zipkin_collector.message_spans.grpc']"
+        type: gauge
+        help: "Current message spans via gRPC"
+      - name: zipkin_collector_messages_grpc_total
+        path: "$['counter.zipkin_collector.messages.grpc']"
+        type: counter
+        help: "Number of collected messages via gRPC"
+      - name: zipkin_collector_messages_dropped_grpc_total
+        path: "$['counter.zipkin_collector.messages_dropped.grpc']"
+        type: counter
+        help: "Number of dropped messages via gRPC"
+      - name: zipkin_collector_spans_dropped_grpc_total
+        path: "$['counter.zipkin_collector.spans_dropped.grpc']"
+        type: counter
+        help: "Number of dropped spans via gRPC"
+      - name: zipkin_collector_message_bytes_http
+        path: "$['gauge.zipkin_collector.message_bytes.http']"
+        type: gauge
+        help: "Current message bytes via HTTP"
+      - name: zipkin_collector_bytes_grpc_total
+        path: "$['counter.zipkin_collector.bytes.grpc']"
+        type: counter
+        help: "Number of collected bytes via gRPC"
+      - name: zipkin_collector_message_bytes_grpc
+        path: "$['gauge.zipkin_collector.message_bytes.grpc']"
+        type: gauge
+        help: "Current message bytes via gRPC"

@@ -1,0 +1,174 @@
+services:
+  ########################
+  # Logging & Monitoring #
+  ########################
+
+  loki:
+    image: grafana/loki:2.9.1
+    container_name: loki
+    restart: unless-stopped
+    user: "0" # Ejecutar como root
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki-config.yml:/etc/loki/loki-config.yml:ro
+      - loki-data-volume:/tmp/loki
+    command: -config.file=/etc/loki/loki-config.yml
+    networks:
+      - monitoring
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    restart: unless-stopped
+    volumes:
+      - /var/log:/var/log:ro                               # Bind mount para logs del host
+      - ./promtail-config.yml:/etc/promtail/config.yml:ro # Bind mount para configuración
+    command: -config.file=/etc/promtail/config.yml --log.level=info
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - loki
+      - prometheus
+    networks:
+      - monitoring
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro # Bind mount para provisioning
+      - grafana-data-volume:/var/lib/grafana               # Volumen nombrado para datos
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro   # Bind mount para configuración
+      - prometheus-data-volume:/prometheus                   # Volumen nombrado para datos
+    networks:
+      - monitoring
+
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: zipkin
+    restart: unless-stopped
+    ports:
+      - "9411:9411"
+    command: ["-prometheus.enabled=true"]
+    networks:
+      - monitoring
+
+  json-exporter:
+    image: prometheuscommunity/json-exporter:latest
+    ports:
+      - "7979:7979"
+    volumes:
+      - ./json-exporter-config.yml:/config.yml:ro
+    command:
+      - "--config.file=/config.yml"
+    networks:
+      - monitoring
+
+
+  ########################
+  # Kafka & Zookeeper    #
+  ########################
+
+  # NO MODIFICAR ESTE BLOQUE
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - monitoring
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"       # Para uso interno de la red Docker
+      - "29092:29092"     # Para acceso externo desde localhost
+    networks:
+      - monitoring
+
+  akhq:
+    image: tchiotludo/akhq:latest
+    container_name: akhq
+    restart: unless-stopped
+    ports:
+      - "8123:8123"
+    environment:
+      - AKHQ_CONFIGURATION=/akhq_config.yml
+      - MICRONAUT_SERVER_PORT=8123
+    volumes:
+      - ./akhq_config.yml:/akhq_config.yml:ro               # Bind mount para configuración
+    networks:
+      - monitoring
+
+  ########################
+  # Databases            #
+  ########################
+
+  authdb:
+    image: postgres:latest
+    container_name: authdb
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: authdb
+    volumes:
+      - ./db:/var/lib/postgresql/data                      # Bind mount para datos
+    networks:
+      - monitoring
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    networks:
+      - monitoring
+
+networks:
+  monitoring:
+    driver: bridge
+
+volumes:
+  loki-data-volume:
+    name: loki-data-volume
+    driver: local
+  prometheus-data-volume:
+    name: prometheus-data-volume
+    driver: local
+  grafana-data-volume:
+    name: grafana-data-volume
+    driver: local
