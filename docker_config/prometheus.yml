@@ -19,3 +19,38 @@ scrape_configs:
       - targets: ['localhost:8888']
         labels:
           application: 'utility-config-server'
+  - job_name: 'APIGATEWAY-SERVER-PROMETHEUS-INPUT'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 3s
+    static_configs:
+      - targets: ['localhost:8072']
+        labels:
+          application: 'utility-apigateway-server'
+  - job_name: 'AUTH-SERVICE-PROMETHEUS-INPUT'
+    metrics_path: 'lox-auth-service/actuator/prometheus'
+    scrape_interval: 3s
+    static_configs:
+      - targets: ['localhost:8072']
+        labels:
+          application: 'lox-auth-service'
+  - job_name: 'ORDER-SERVICE-PROMETHEUS-INPUT'
+    metrics_path: 'lox-order-service/actuator/prometheus'
+    scrape_interval: 3s
+    static_configs:
+      - targets: ['localhost:8072']
+        labels:
+          application: 'lox-order-service'
+  - job_name: 'INVENTORY-SERVICE-PROMETHEUS-INPUT'
+    metrics_path: 'lox-inventory-service/actuator/prometheus'
+    scrape_interval: 3s
+    static_configs:
+      - targets: ['localhost:8072']
+        labels:
+          application: 'lox-inventory-service'
+  - job_name: 'PAYMENT-SERVICE-PROMETHEUS-INPUT'
+    metrics_path: 'lox-payment-service/actuator/prometheus'
+    scrape_interval: 3s
+    static_configs:
+      - targets: ['localhost:8072']
+        labels:
+          application: 'lox-payment-service'
