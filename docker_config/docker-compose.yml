@@ -86,6 +86,21 @@ services:
   ########################
 
   # NO MODIFICAR ESTE BLOQUE
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    container_name: kafdrop
+    restart: unless-stopped
+    ports:
+      - "9000:9000"  # Puerto para acceder a la interfaz web de Kafdrop
+    environment:
+      KAFKA_BROKERCONNECT: 'kafka:9092'  # Dirección interna de Kafka dentro de Docker
+      JVM_OPTS: "-Xms32M -Xmx64M"        # Opcional: Configuración de memoria para JVM
+      SERVER_SERVLET_CONTEXTPATH: "/"    # Contexto de la aplicación
+    depends_on:
+      - kafka  # Asegura que Kafka se inicie antes que Kafdrop
+    networks:
+      - monitoring  # Mismo network que tus otros servicios
+
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     container_name: zookeeper
@@ -112,20 +127,6 @@ services:
     ports:
       - "9092:9092"       # Para uso interno de la red Docker
       - "29092:29092"     # Para acceso externo desde localhost
-    networks:
-      - monitoring
-
-  akhq:
-    image: tchiotludo/akhq:latest
-    container_name: akhq
-    restart: unless-stopped
-    ports:
-      - "8123:8123"
-    environment:
-      - AKHQ_CONFIGURATION=/akhq_config.yml
-      - MICRONAUT_SERVER_PORT=8123
-    volumes:
-      - ./akhq_config.yml:/akhq_config.yml:ro               # Bind mount para configuración
     networks:
       - monitoring
 
