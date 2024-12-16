@@ -149,6 +149,51 @@ services:
     networks:
       - monitoring
 
+  ordersdb:
+    image: postgres:latest
+    container_name: ordersdb
+    restart: unless-stopped
+    ports:
+      - "5433:5433"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: ordersdb
+    volumes:
+      - ordersdb-data:/var/lib/postgresql/data
+    networks:
+      - monitoring
+
+  inventorydb:
+    image: postgres:latest
+    container_name: inventorydb
+    restart: unless-stopped
+    ports:
+      - "5434:5434"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: inventorydb
+    volumes:
+      - inventorydb-data:/var/lib/postgresql/data
+    networks:
+      - monitoring
+
+  paymentdb:
+    image: postgres:latest
+    container_name: paymentdb
+    restart: unless-stopped
+    ports:
+      - "5435:5435"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: paymentdb
+    volumes:
+      - paymentdb-data:/var/lib/postgresql/data
+    networks:
+      - monitoring
+
   redis:
     image: redis:latest
     container_name: redis
@@ -165,11 +210,16 @@ networks:
 
 volumes:
   loki-data-volume:
-    name: loki-data-volume
     driver: local
   prometheus-data-volume:
-    name: prometheus-data-volume
     driver: local
   grafana-data-volume:
-    name: grafana-data-volume
+    driver: local
+  authdb-data:
+    driver: local
+  ordersdb-data:
+    driver: local
+  inventorydb-data:
+    driver: local
+  paymentdb-data:
     driver: local
