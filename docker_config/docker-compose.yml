@@ -151,16 +151,16 @@ services:
 
   ordersdb:
     image: postgres:latest
-    container_name: ordersdb
+    container_name: orderdb
     restart: unless-stopped
     ports:
       - "5433:5433"
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
-      POSTGRES_DB: ordersdb
+      POSTGRES_DB: orderdb
     volumes:
-      - ordersdb-data:/var/lib/postgresql/data
+      - orderdb-data:/var/lib/postgresql/data
     networks:
       - monitoring
 
@@ -194,6 +194,21 @@ services:
     networks:
       - monitoring
 
+  productcatalogdb:
+    image: postgres:latest
+    container_name: productcatalogdb
+    restart: unless-stopped
+    ports:
+      - "5436:5436"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: productcatalogdb
+    volumes:
+      - productcatalogdb-data:/var/lib/postgresql/data
+    networks:
+      - monitoring
+
   redis:
     image: redis:latest
     container_name: redis
@@ -217,9 +232,11 @@ volumes:
     driver: local
   authdb-data:
     driver: local
-  ordersdb-data:
+  orderdb-data:
     driver: local
   inventorydb-data:
     driver: local
   paymentdb-data:
+    driver: local
+  productcatalogdb-data:
     driver: local
