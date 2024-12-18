@@ -124,6 +124,10 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_ENABLE_IDEMPOTENCE: "true"
+      KAFKA_ACKS: "all"
+      KAFKA_RETRIES: "3"
+      KAFKA_MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION: "1"
     ports:
       - "9092:9092"       # Para uso interno de la red Docker
       - "29092:29092"     # Para acceso externo desde localhost
@@ -154,7 +158,7 @@ services:
     container_name: orderdb
     restart: unless-stopped
     ports:
-      - "5433:5433"
+      - "5433:5432"
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
@@ -169,7 +173,7 @@ services:
     container_name: inventorydb
     restart: unless-stopped
     ports:
-      - "5434:5434"
+      - "5434:5432"
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
@@ -184,7 +188,7 @@ services:
     container_name: paymentdb
     restart: unless-stopped
     ports:
-      - "5435:5435"
+      - "5435:5432"
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
@@ -199,7 +203,7 @@ services:
     container_name: productcatalogdb
     restart: unless-stopped
     ports:
-      - "5436:5436"
+      - "5436:5432"
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
@@ -209,13 +213,20 @@ services:
     networks:
       - monitoring
 
+
+  ########################
+  # Redis                 #
+  ########################
+
   redis:
-    image: redis:latest
+    image: redis:7.0
     container_name: redis
     restart: unless-stopped
     ports:
       - "6379:6379"
-    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
     networks:
       - monitoring
 
