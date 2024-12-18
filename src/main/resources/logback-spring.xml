@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+    <!-- Includes basic Spring Boot configuration -->
     <include resource="org/springframework/boot/logging/logback/base.xml" />
+
+    <!-- Application property configuration -->
     <springProperty scope="context" name="appName" source="spring.application.name"/>
 
+    <!-- Appender for logs in Loki -->
     <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
         <http>
             <url>http://localhost:3100/loki/api/v1/push</url>
@@ -32,7 +36,24 @@
         <immediateFlush>true</immediateFlush>
     </appender>
 
+    <!-- RollingFileAppender for local storage -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- Defines pattern for rotated log files -->
+            <fileNamePattern>logs/app-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- Retain logs for the last 30 days -->
+            <maxHistory>30</maxHistory>
+            <!-- Maximum size for compression -->
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Configure logging level and appenders -->
     <root level="INFO">
         <appender-ref ref="LOKI"/>
+        <appender-ref ref="FILE"/>
     </root>
 </configuration>
