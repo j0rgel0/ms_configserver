@@ -38,5 +38,6 @@ out/
 
 ### DB dumps ###
 /docker_config/db/
+/logs/
 /logs/app-2024-12-17.log
 /logs/app-2024-12-18.log
